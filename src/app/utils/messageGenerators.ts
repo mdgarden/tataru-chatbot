@@ -20,21 +20,13 @@ const pickRandomYOSHIDA = () => {
 
 const generateQuickReply = (command: string) => {
   return command.includes(HELP_ME_OMEGA)
-    ? generateTextMessage(HELP_ME_OMEGA)
-    : generateTextMessage(pickRandomYOSHIDA());
-};
-
-const generateTextMessage = (message: string) => {
-  return { ...TEXT_TEMPLATE, text: message };
+    ? { ...TEXT_TEMPLATE, text: HELP_ME_OMEGA }
+    : { ...TEXT_TEMPLATE, text: pickRandomYOSHIDA() };
 };
 
 const generateFlexMessage = (message: string) => {
   // getNewNotice()
   return { ...FLEX_NOTICE_TEMPLATE, text: message };
-};
-
-const generateLinksMessage = () => {
-  return { ...TEXT_TEMPLATE, text: LINKS_MESSAGE };
 };
 
 export const generateMessage = (command: string): ReplyMessage => {
@@ -46,6 +38,7 @@ export const generateMessage = (command: string): ReplyMessage => {
 
   if (command.startsWith(COMMAND_SEARCH)) return { type: "flex", text: "검색" }; // searchItem(command)
   if (command === COMMAND_NOTCE) return generateFlexMessage(command);
-  if (command === COMMAND_LINKS) return generateLinksMessage();
+  if (command === COMMAND_LINKS)
+    return { ...TEXT_TEMPLATE, text: LINKS_MESSAGE };
   if (isQuickReply) return generateQuickReply(command);
 };
