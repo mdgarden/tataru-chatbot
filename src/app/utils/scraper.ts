@@ -1,13 +1,18 @@
 import * as cheerio from "cheerio";
+import {
+  EPOCHTIMER_SELECTOR,
+  JP_LODESTONE_DOMAIN,
+  LODESTONE,
+  NOTICELIST_SELECTOR,
+  TOPICLIST_SELECTOR,
+} from "./consts/selectors";
+import { getLodestoneTime } from "./helpers";
 
-const NOTICELIST_SELECTOR =
-  ".toptabchanger_newsbox:first-child ul:nth-of-type(2) li";
-const NOTICE_OBJ = "";
-const TOPICLIST_SELECTOR = ".news__list--topics_top li";
-
-export const getGlobalNotice = async () => {
+// news : 상위 카테고리
+// topic, notice : 하위 카테고리
+export const getGlobalNews = async () => {
   // Fetch the HTML content of the web page to be scraped
-  const response = await fetch("https://jp.finalfantasyxiv.com/lodestone/");
+  const response = await fetch(JP_LODESTONE_DOMAIN + LODESTONE);
   const html = await response.text();
 
   // Load the HTML content into Cheerio
@@ -16,9 +21,19 @@ export const getGlobalNotice = async () => {
   // Use Cheerio selectors to extract the desired data
   const noticeList = $(NOTICELIST_SELECTOR)
     .map((_, notice) => {
+      const date = $(notice)
+        .find(".news__list--time")
+        .text()
+        .split(EPOCHTIMER_SELECTOR)[1]
+        .match(/\d+/g);
+
+      const formattedDate = date?.length && getLodestoneTime(date[0]);
+
       return {
         title: $(notice).find("p").text(),
-        link: $(notice).find("a").attr("href"),
+        date: formattedDate,
+        postUrl: JP_LODESTONE_DOMAIN + $(notice).find("a").attr("href"),
+        text: "",
       };
     })
     .toArray();
@@ -26,9 +41,23 @@ export const getGlobalNotice = async () => {
   const topicList = $(TOPICLIST_SELECTOR)
     .slice(0, 3)
     .map((_, topic) => {
+      const date = $(topic)
+        .find(".news__list--time")
+        .text()
+        .split(EPOCHTIMER_SELECTOR)[1]
+        .match(/\d+/g);
+
+      const formattedDate = date?.length && getLodestoneTime(date[0]);
+
       return {
         title: $(topic).find("a").first().text(),
-        link: $(topic).find("a").first().attr("href"),
+        date: formattedDate,
+        postUrl: JP_LODESTONE_DOMAIN + $(topic).find("a").first().attr("href"),
+        imgUrl: $(topic)
+          .find("img")
+          .attr("src")
+          ?.split(/.png|.jpg/)[0],
+        text: $(topic).find("p.mdl-text__xs-m16").text(),
       };
     })
     .toArray();
