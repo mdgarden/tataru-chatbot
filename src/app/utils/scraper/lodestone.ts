@@ -7,9 +7,10 @@ import {
   NOTICELIST_SELECTOR,
   NOTICE_TEXT_SELECTOR,
   TOPICLIST_SELECTOR,
-} from "./consts/selectors";
-import { getLodestoneTime } from "./helpers";
-import { NoticeProps } from "./types";
+  TOPIC_DETAIL_SELECTOR,
+} from "../consts/selectors";
+import { getLodestoneTime } from "../helpers";
+import { Notice } from "../types";
 
 type News = "topic" | "notice";
 
@@ -35,29 +36,31 @@ async function getNoticeDetail(targetUrl: string) {
   return $(NOTICE_TEXT_SELECTOR).text();
 }
 
-const getNews = async (newsType: News) => {
+async function getNews(newsType: News): Promise<Notice[]> {
   const isTopic = newsType === "topic";
   const selector = isTopic ? TOPICLIST_SELECTOR : NOTICELIST_SELECTOR;
   const $ = await loadHtml(JP_LODESTONE_DOMAIN + LODESTONE);
 
   const parsedNews = $(selector)
     .map(async (_, news) => {
-      const date = parseDate($, news as cheerio.Element);
-      const formattedDate = date?.length && getLodestoneTime(date[0]);
+      const parsedDate = parseDate($, news);
+      const date = getLodestoneTime(parsedDate![0]);
+      const title = $(news).find("p").text();
+      const imgUrl = isTopic
+        ? $(news)
+            .find("img")
+            .attr("src")
+            ?.split(/.png|.jpg/)[0]
+        : "https://img.finalfantasyxiv.com/t/074874d66579b40aba1595f64fc2196c692dd35a.png"; // Todo: notice용 공지 이미지 확보
       const postUrl = JP_LODESTONE_DOMAIN + $(news).find("a").attr("href");
       const text = isTopic
-        ? $(news).find("p.mdl-text__xs-m16").text()
+        ? $(news).find(TOPIC_DETAIL_SELECTOR).text()
         : await getNoticeDetail(postUrl);
 
       return {
-        title: $(news).find("p").text(),
-        date: formattedDate,
-        imgUrl: isTopic
-          ? $(news)
-              .find("img")
-              .attr("src")
-              ?.split(/.png|.jpg/)[0]
-          : "",
+        title,
+        date,
+        imgUrl,
         text,
         postUrl,
       };
@@ -65,7 +68,7 @@ const getNews = async (newsType: News) => {
     .toArray();
 
   return Promise.all(parsedNews);
-};
+}
 
 export const getGlobalTopics = async () => {
   const topics = await getNews("topic");
@@ -75,6 +78,6 @@ export const getGlobalTopics = async () => {
 
 export const getGlobalNotices = async () => {
   const notices = await getNews("notice");
-
+  // console.log(notices);
   return notices;
 };

@@ -12,14 +12,14 @@ const client = new line.messagingApi.MessagingApiClient({
 export async function POST(req: Request) {
   const body = await req.json();
   const replyToken = body.events[0].replyToken;
-  const message = generateMessage(body.events[0].message.text);
+  const message = await generateMessage(body.events[0].message.text);
 
-  if (!message) return Response.json({});
-
-  return Response.json(
-    client.replyMessage({
-      replyToken,
-      messages: [message],
-    })
-  );
+  return message
+    ? Response.json(
+        client.replyMessage({
+          replyToken,
+          messages: [message],
+        })
+      )
+    : {};
 }

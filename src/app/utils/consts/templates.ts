@@ -24,7 +24,6 @@ export const NOTICE_HEADER_STYLE = {
       wrap: true,
       scaling: false,
       size: "lg",
-      margin: "none",
       align: "start",
       weight: "bold",
     },
@@ -37,12 +36,6 @@ export const NOTICE_HEADER_STYLE = {
       color: "#eeeeee",
     },
   ],
-  offsetTop: "none",
-  offsetBottom: "none",
-  offsetStart: "none",
-  offsetEnd: "none",
-  spacing: "none",
-  margin: "none",
   paddingAll: "xxl",
   paddingBottom: "md",
   paddingStart: "xl",
@@ -50,18 +43,11 @@ export const NOTICE_HEADER_STYLE = {
 };
 
 export const NOICE_HERO_STYLE = {
-  type: "box",
-  layout: "vertical",
-  contents: [
-    {
-      type: "image",
-      url: "", // 공지 사진
-      aspectRatio: "4:1",
-      aspectMode: "cover",
-      size: "full",
-    },
-  ],
-  paddingAll: "xl",
+  type: "image",
+  url: "", // 공지 사진
+  aspectRatio: "4:1",
+  aspectMode: "cover",
+  size: "full",
 };
 
 export const NOTICE_BODY_STYLE = {
