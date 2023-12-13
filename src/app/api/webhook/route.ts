@@ -17,12 +17,12 @@ export async function POST(req: Request) {
   const replyToken = body.events[0].replyToken;
   const message = await generateMessage(body.events[0].message.text);
 
-  if (!message) return;
-
-  return Response.json(
-    client.replyMessage({
-      replyToken,
-      messages: [message],
-    })
-  );
+  return message
+    ? Response.json(
+        client.replyMessage({
+          replyToken,
+          messages: [message],
+        })
+      )
+    : Response.json({});
 }
