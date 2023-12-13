@@ -14,6 +14,8 @@ export async function POST(req: Request) {
   const replyToken = body.events[0].replyToken;
   const message = await generateMessage(body.events[0].message.text);
 
+  if (!message) return Response.json({});
+
   return message
     ? Response.json(
         client.replyMessage({
