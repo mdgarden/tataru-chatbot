@@ -18,9 +18,8 @@ type News = "topic" | "notice";
 async function loadHtml(targetUrl: string) {
   const response = await fetch(targetUrl);
   const html = await response.text();
-  const $ = cheerio.load(html);
 
-  return $;
+  return cheerio.load(html);
 }
 
 function parseDate($: cheerio.CheerioAPI, elem: cheerio.Element) {
