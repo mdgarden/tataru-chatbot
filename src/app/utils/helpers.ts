@@ -4,8 +4,20 @@ const getRandomInt = (max: number) => {
   return Math.floor(Math.random() * max);
 };
 
+/**
+ * 요시다 가챠
+ * @returns 랜덤 요시다
+ */
 export const pickRandomYOSHIDA = () => {
   return HELP_ME_YOSHIDA[getRandomInt(HELP_ME_YOSHIDA.length)];
+};
+
+/**
+ * 200자를 초과하는 텍스트를 말줄임표로 변환
+ * @param text
+ */
+export const addEllipsis = (text: string) => {
+  return text.length > 200 ? text.substring(0, 199) + "..." : text;
 };
 
 /**
@@ -21,4 +33,5 @@ export const getLodestoneTime = (unixMs: string): string => {
   return `${yy}/${mm}/${dd}`;
 };
 
+// TODO : 인게임 시간 획득
 export const getEorzeaTime = () => {};

@@ -11,6 +11,7 @@ import {
 } from "../consts/selectors";
 import { getLodestoneTime } from "../helpers";
 import { Notice } from "../types";
+import { NEWS_BANNER_IMG } from "../consts/templates";
 
 type News = "topic" | "notice";
 
@@ -23,11 +24,12 @@ async function loadHtml(targetUrl: string) {
 }
 
 function parseDate($: cheerio.CheerioAPI, elem: cheerio.Element) {
-  return $(elem)
+  const date = $(elem)
     .find(NEWSDATE_SELECTOR)
     .text()
     .split(EPOCHTIMER_SELECTOR)[1]
     .match(/\d+/g);
+  return date;
 }
 
 async function getNoticeDetail(targetUrl: string) {
@@ -45,13 +47,10 @@ async function getNews(newsType: News): Promise<Notice[]> {
     .map(async (_, news) => {
       const parsedDate = parseDate($, news);
       const date = getLodestoneTime(parsedDate![0]);
-      const title = $(news).find("p").text();
+      const title = $(news).find("p").first().text();
       const imgUrl = isTopic
-        ? $(news)
-            .find("img")
-            .attr("src")
-            ?.split(/.png|.jpg/)[0]
-        : "https://img.finalfantasyxiv.com/t/074874d66579b40aba1595f64fc2196c692dd35a.png"; // Todo: notice용 공지 이미지 확보
+        ? $(news).find("img").attr("src")?.split("?")[0]
+        : process.env.NEWS_BANNER_IMG!;
       const postUrl = JP_LODESTONE_DOMAIN + $(news).find("a").attr("href");
       const text = isTopic
         ? $(news).find(TOPIC_DETAIL_SELECTOR).text()
@@ -73,11 +72,10 @@ async function getNews(newsType: News): Promise<Notice[]> {
 export const getGlobalTopics = async () => {
   const topics = await getNews("topic");
 
-  return topics;
+  return topics.length > 5 ? topics.slice(0, 4) : topics;
 };
 
 export const getGlobalNotices = async () => {
   const notices = await getNews("notice");
-  // console.log(notices);
   return notices;
 };
