@@ -49,7 +49,7 @@ async function getNews(newsType: News): Promise<Notice[]> {
       const title = $(news).find("p").first().text();
       const imgUrl = isTopic
         ? $(news).find("img").attr("src")?.split("?")[0]
-        : process.env.NEWS_BANNER_IMG!;
+        : NEWS_BANNER_IMG;
       const postUrl = JP_LODESTONE_DOMAIN + $(news).find("a").attr("href");
       const text = isTopic
         ? $(news).find(TOPIC_DETAIL_SELECTOR).text()
