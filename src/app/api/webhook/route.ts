@@ -16,12 +16,10 @@ export async function POST(req: Request) {
 
   if (!message) return Response.json({});
 
-  return message
-    ? Response.json(
-        client.replyMessage({
-          replyToken,
-          messages: [message],
-        })
-      )
-    : {};
+  return Response.json(
+    client.replyMessage({
+      replyToken,
+      messages: [message],
+    })
+  );
 }
