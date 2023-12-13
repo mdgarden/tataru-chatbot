@@ -1,5 +1,7 @@
-import { FlexBubbleStyle } from "@line/bot-sdk";
-import { FlexBox, FlexBubble, FlexMessage, TextMessage } from "../types";
+import { FlexBubble, FlexMessage, TextMessage } from "../types";
+
+export const NEWS_BANNER_IMG =
+  "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FIfzcW%2FbtsBMTD7RCs%2FywJJY7RpoKb1acdgNJNiLK%2Fimg.png";
 
 export const LINKS_MESSAGE = `글섭 공홈 : https://jp.finalfantasyxiv.com/lodestone/
 한섭 공홈 : https://www.ff14.co.kr/main
@@ -23,8 +25,7 @@ export const NOTICE_HEADER_STYLE = {
       color: "#eeeeee",
       wrap: true,
       scaling: false,
-      size: "lg",
-      margin: "none",
+      size: "md",
       align: "start",
       weight: "bold",
     },
@@ -37,31 +38,18 @@ export const NOTICE_HEADER_STYLE = {
       color: "#eeeeee",
     },
   ],
-  offsetTop: "none",
-  offsetBottom: "none",
-  offsetStart: "none",
-  offsetEnd: "none",
-  spacing: "none",
-  margin: "none",
   paddingAll: "xxl",
   paddingBottom: "md",
   paddingStart: "xl",
   paddingEnd: "xl",
 };
 
-export const NOICE_HERO_STYLE = {
-  type: "box",
-  layout: "vertical",
-  contents: [
-    {
-      type: "image",
-      url: "", // 공지 사진
-      aspectRatio: "4:1",
-      aspectMode: "cover",
-      size: "full",
-    },
-  ],
-  paddingAll: "xl",
+export const NOTICE_HERO_STYLE = {
+  type: "image",
+  url: "", // 공지 사진
+  aspectRatio: "4:1",
+  aspectMode: "cover",
+  size: "full",
 };
 
 export const NOTICE_BODY_STYLE = {
@@ -75,7 +63,7 @@ export const NOTICE_BODY_STYLE = {
       size: "sm",
     },
   ],
-  paddingAll: "none",
+  paddingAll: "xxl",
 };
 
 export const NOTICE_FOOTER_STYLE = {
