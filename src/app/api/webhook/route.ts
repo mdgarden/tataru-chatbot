@@ -16,19 +16,18 @@ export async function POST(req: Request) {
 
   // NOTE: 콘솔 웹훅 URL 검증용
   if (!body.events.length) {
-    return Response.json([]);
+    return Response.json({});
   }
 
   if (body.events[0].message.text === COMMAND_BYE) {
-    console.log(body.events[0].source.groupId);
-    return client.leaveGroup(body.events[0].source.groupId);
+    return Response.json(client.leaveGroup(body.events[0].source.groupId));
   }
 
   const message = await handleTextEvent(body.events[0].message.text);
   const replyToken = body.events[0].replyToken;
 
   if (!message) {
-    return;
+    return Response.json({});
   }
 
   return Response.json(
