@@ -12,28 +12,33 @@ const client = new line.messagingApi.MessagingApiClient({
 });
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  try {
+    const body = await req.json();
 
-  // NOTE: 콘솔 웹훅 URL 검증용
-  if (!body.events.length) {
-    return Response.json({});
-  }
+    if (!body.events.length) {
+      return Response.json({});
+    }
 
-  if (body.events[0].message.text === COMMAND_BYE) {
-    return Response.json(client.leaveGroup(body.events[0].source.groupId));
-  }
+    if (body.events[0].message.text === COMMAND_BYE) {
+      await client.leaveGroup(body.events[0].source.groupId);
+      return Response.json({ success: true });
+    }
 
-  const message = await handleTextEvent(body.events[0].message.text);
-  const replyToken = body.events[0].replyToken;
+    const message = await handleTextEvent(body.events[0].message.text);
+    const replyToken = body.events[0].replyToken;
 
-  if (!message) {
-    return Response.json({});
-  }
+    if (!message) {
+      return Response.json({});
+    }
 
-  return Response.json(
-    client.replyMessage({
+    await client.replyMessage({
       replyToken,
       messages: [message],
-    })
-  );
+    });
+
+    return Response.json({ success: true });
+  } catch (error) {
+    console.error("Error:", error);
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
