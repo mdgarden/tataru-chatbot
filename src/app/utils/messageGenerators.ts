@@ -75,15 +75,19 @@ export async function generateMessage(command: string) {
 
   // TODO: 느낌표, 골뱅이 제외 특수문자 패스:  !!! 나 !?! 를 회피하기 위함
   // if (command.startsWith(COMMAND_SEARCH)) return { type: "text", text: "검색" }; // searchItem(command)
-  if (command === COMMAND_NOTICE) {
-    const notices = await getGlobalNotices();
-    return generateNewsCarousel(notices);
+  switch (command) {
+    case COMMAND_NOTICE: {
+      const notices = await getGlobalNotices();
+      return generateNewsCarousel(notices);
+    }
+    case COMMAND_TOPIC: {
+      const topics = await getGlobalTopics();
+      return generateNewsCarousel(topics);
+    }
+    case COMMAND_LINKS:
+      return { ...TEXT_TEMPLATE, text: LINKS_MESSAGE };
+    default:
+      if (isQuickReply) return generateQuickReply(command);
+      return;
   }
-  if (command === COMMAND_TOPIC) {
-    const topics = await getGlobalTopics();
-    return generateNewsCarousel(topics);
-  }
-  if (command === COMMAND_LINKS)
-    return { ...TEXT_TEMPLATE, text: LINKS_MESSAGE };
-  if (isQuickReply) return generateQuickReply(command);
 }
