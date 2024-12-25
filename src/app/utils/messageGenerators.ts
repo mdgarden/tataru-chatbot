@@ -1,8 +1,8 @@
 import {
   COMMAND_LINKS,
+  COMMAND_NAVI,
   COMMAND_NOTICE,
   COMMAND_QUICK_REPLY,
-  COMMAND_SEARCH,
   COMMAND_TOPIC,
   HELP_ME_OMEGA,
 } from "./consts/commands";
@@ -24,6 +24,10 @@ function generateQuickReply(command: string) {
   return command.includes(HELP_ME_OMEGA)
     ? { ...TEXT_TEMPLATE, text: HELP_ME_OMEGA }
     : { ...TEXT_TEMPLATE, text: pickRandomYOSHIDA() };
+}
+
+function generateNaviReply() {
+  return { ...TEXT_TEMPLATE, text: Math.random() < 0.5 ? "왼쪽" : "오른쪽" };
 }
 
 function convertToBubble({ title, date, text, imgUrl, postUrl }: Notice) {
@@ -68,7 +72,7 @@ export function generateNewsCarousel(parsedProps: Notice[]): FlexMessage {
   return carousel;
 }
 
-export async function generateMessage(command: string) {
+export async function handleTextEvent(command: string) {
   const isQuickReply = !!COMMAND_QUICK_REPLY.find((word) =>
     command.includes(word)
   );
@@ -86,6 +90,8 @@ export async function generateMessage(command: string) {
     }
     case COMMAND_LINKS:
       return { ...TEXT_TEMPLATE, text: LINKS_MESSAGE };
+    case COMMAND_NAVI:
+      return generateNaviReply();
     default:
       if (isQuickReply) return generateQuickReply(command);
       return;
