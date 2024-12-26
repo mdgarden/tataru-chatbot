@@ -1,6 +1,6 @@
 import * as line from "@line/bot-sdk";
 
-import { COMMAND_BYE, COMMAND_NAVI } from "@/app/utils/consts/commands";
+import { COMMAND_BYE } from "@/app/utils/consts/commands";
 import { handleTextEvent } from "@/app/utils/messageGenerators";
 
 const config = {
@@ -13,28 +13,25 @@ const client = new line.messagingApi.MessagingApiClient({
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const { events } = await req.json();
 
-    if (!body.events.length) {
-      return Response.json({});
-    }
-
-    if (body.events[0].message.text === COMMAND_BYE) {
-      await client.leaveGroup(body.events[0].source.groupId);
+    if (!events.length) {
       return Response.json({ success: true });
     }
 
-    const message = await handleTextEvent(body.events[0].message.text);
-    const replyToken = body.events[0].replyToken;
-
-    if (!message) {
-      return Response.json({});
+    if (events[0].message.text === COMMAND_BYE) {
+      await client.leaveGroup(events[0].source.groupId);
+      return Response.json({ success: true });
     }
 
-    await client.replyMessage({
-      replyToken,
-      messages: [message],
-    });
+    const newMessage = await handleTextEvent(events[0].message.text);
+
+    if (newMessage) {
+      await client.replyMessage({
+        replyToken: events[0].replyToken,
+        messages: [newMessage],
+      });
+    }
 
     return Response.json({ success: true });
   } catch (error) {
