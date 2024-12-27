@@ -15,6 +15,11 @@ const client = new line.messagingApi.MessagingApiClient({
 export async function POST(req: Request) {
   try {
     const { events } = await req.json();
+
+    if (!events.length) {
+      return NextResponse.json({ success: true });
+    }
+
     const { message, source, replyToken } = events[0];
 
     if (message.type === "text") {
@@ -22,6 +27,7 @@ export async function POST(req: Request) {
         await client.leaveGroup(source.groupId);
       } else {
         const newMessage = await handleTextEvent(message.text);
+
         if (newMessage) {
           await client.replyMessage({
             replyToken: replyToken,
