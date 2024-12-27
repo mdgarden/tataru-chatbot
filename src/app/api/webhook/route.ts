@@ -2,6 +2,7 @@ import * as line from "@line/bot-sdk";
 
 import { COMMAND_BYE } from "@/app/utils/consts/commands";
 import { handleTextEvent } from "@/app/utils/messageGenerators";
+import { NextResponse } from "next/server";
 
 const config = {
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN!,
@@ -14,28 +15,28 @@ const client = new line.messagingApi.MessagingApiClient({
 export async function POST(req: Request) {
   try {
     const { events } = await req.json();
+    const { message, source, replyToken } = events[0];
 
-    if (!events.length) {
-      return Response.json({ success: true });
+    if (message.type === "text") {
+      if (message.text === COMMAND_BYE) {
+        await client.leaveGroup(source.groupId);
+      } else {
+        const newMessage = await handleTextEvent(message.text);
+        if (newMessage) {
+          await client.replyMessage({
+            replyToken: replyToken,
+            messages: [newMessage],
+          });
+        }
+      }
     }
 
-    if (events[0].message.text === COMMAND_BYE) {
-      await client.leaveGroup(events[0].source.groupId);
-      return Response.json({ success: true });
-    }
-
-    const newMessage = await handleTextEvent(events[0].message.text);
-
-    if (newMessage) {
-      await client.replyMessage({
-        replyToken: events[0].replyToken,
-        messages: [newMessage],
-      });
-    }
-
-    return Response.json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error:", error);
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

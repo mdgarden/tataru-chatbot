@@ -1,3 +1,4 @@
+import { getGlobalNotices, getGlobalTopics } from "./scraper/lodestone";
 import {
   COMMAND_LINKS,
   COMMAND_NAVI,
@@ -17,16 +18,15 @@ import {
   NOTICE_HEADER_STYLE,
   TEXT_TEMPLATE,
 } from "./consts/templates";
-import { getGlobalNotices, getGlobalTopics } from "./scraper/lodestone";
-import { FlexMessage, Notice } from "./types";
+import { FlexMessage, TextMessage, Notice } from "./types";
 
-function generateQuickReply(command: string) {
+function generateQuickReply(command: string): TextMessage {
   return command.includes(HELP_ME_OMEGA)
     ? { ...TEXT_TEMPLATE, text: HELP_ME_OMEGA }
     : { ...TEXT_TEMPLATE, text: pickRandomYOSHIDA() };
 }
 
-function generateNaviReply() {
+function generateNaviReply(): TextMessage {
   return { ...TEXT_TEMPLATE, text: Math.random() < 0.5 ? "왼쪽" : "오른쪽" };
 }
 
@@ -72,13 +72,18 @@ export function generateNewsCarousel(parsedProps: Notice[]): FlexMessage {
   return carousel;
 }
 
-export async function handleTextEvent(command: string) {
+export async function handleTextEvent(
+  command: string
+): Promise<FlexMessage | TextMessage | null> {
   const isQuickReply = !!COMMAND_QUICK_REPLY.find((word) =>
     command.includes(word)
   );
 
-  // TODO: 느낌표, 골뱅이 제외 특수문자 패스:  !!! 나 !?! 를 회피하기 위함
-  // if (command.startsWith(COMMAND_SEARCH)) return { type: "text", text: "검색" }; // searchItem(command)
+  if (isQuickReply) {
+    return generateQuickReply(command);
+  }
+
+  // TODO: 느낌표, 골뱅이 제외 특수문자 패스 처리 필요(!!! 혹은 ?!! 같은)
   switch (command) {
     case COMMAND_NOTICE: {
       const notices = await getGlobalNotices();
@@ -93,7 +98,6 @@ export async function handleTextEvent(command: string) {
     case COMMAND_NAVI:
       return generateNaviReply();
     default:
-      if (isQuickReply) return generateQuickReply(command);
-      return;
+      return null;
   }
 }
