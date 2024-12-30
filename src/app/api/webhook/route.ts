@@ -16,23 +16,16 @@ export async function POST(req: Request) {
   try {
     const { events } = await req.json();
 
-    if (!events.length) {
-      return NextResponse.json({ success: true });
-    }
+    if (events[0]?.message?.type === "text") {
+      const { message, source, replyToken } = events[0];
 
-    const { message, source, replyToken } = events[0];
-
-    if (message.type === "text") {
       if (message.text === COMMAND_BYE) {
         await client.leaveGroup(source.groupId);
       } else {
         const newMessage = await handleTextEvent(message.text);
 
         if (newMessage) {
-          await client.replyMessage({
-            replyToken: replyToken,
-            messages: [newMessage],
-          });
+          await client.replyMessage({ replyToken, messages: [newMessage] });
         }
       }
     }
