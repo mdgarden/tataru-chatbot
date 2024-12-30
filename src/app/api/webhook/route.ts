@@ -21,12 +21,12 @@ export async function POST(req: Request) {
 
       if (message.text === COMMAND_BYE) {
         await client.leaveGroup(source.groupId);
-      } else {
-        const newMessage = await handleTextEvent(message.text);
+      }
 
-        if (newMessage) {
-          await client.replyMessage({ replyToken, messages: [newMessage] });
-        }
+      const newMessage = await handleTextEvent(message.text);
+
+      if (newMessage) {
+        await client.replyMessage({ replyToken, messages: [newMessage] });
       }
     }
 
