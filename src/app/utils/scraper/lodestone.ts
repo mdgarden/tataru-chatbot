@@ -76,5 +76,6 @@ export const getGlobalTopics = async () => {
 
 export const getGlobalNotices = async () => {
   const notices = await getNews("notice");
+
   return notices;
 };
