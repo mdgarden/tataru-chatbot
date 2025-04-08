@@ -1,35 +1,19 @@
-import * as line from "@line/bot-sdk";
-
-import { COMMAND_BYE } from "@/app/utils/consts/commands";
-import { handleTextEvent } from "@/app/utils/messageGenerators";
 import { NextResponse } from "next/server";
+import { Container } from "../../../infrastructure/container";
+import { bootstrap } from "../../../infrastructure/bootstrap";
+import { WebhookController } from "../../../presentation/api/webhook/WebhookController";
 
-const config = {
-  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN!,
-  channelSecret: process.env.LINE_CHANNEL_SECRET!,
-};
-const client = new line.messagingApi.MessagingApiClient({
-  channelAccessToken: config.channelAccessToken,
-});
+// 서비스 초기화
+bootstrap();
 
 export async function POST(req: Request) {
   try {
     const { events } = await req.json();
+    const container = Container.getInstance();
+    const webhookController =
+      container.get<WebhookController>("webhookController");
 
-    if (events[0]?.message?.type === "text") {
-      const { message, source, replyToken } = events[0];
-
-      if (message.text === COMMAND_BYE) {
-        await client.leaveGroup(source.groupId);
-      }
-
-      const newMessage = await handleTextEvent(message.text);
-
-      if (newMessage) {
-        await client.replyMessage({ replyToken, messages: [newMessage] });
-      }
-    }
-
+    await webhookController.handleWebhook(events);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error:", error);
